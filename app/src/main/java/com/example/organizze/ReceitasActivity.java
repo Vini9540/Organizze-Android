@@ -25,7 +25,7 @@ public class ReceitasActivity extends AppCompatActivity {
     private TextInputEditText campoData, campoCategoria, campoDescricao;
     private EditText campoValor;
     private Movimentacao movimentacao;
-    private DatabaseReference mRef;
+    private DatabaseReference mRef= FirebaseDatabase.getInstance().getReference();
     private FirebaseAuth autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
     private Double receitaTotal;
 
@@ -59,6 +59,8 @@ public class ReceitasActivity extends AppCompatActivity {
             atualizarReceita( receitaAtualizada );
 
             movimentacao.salvar(data);
+
+            finish();
 
         }
 
@@ -106,9 +108,8 @@ public class ReceitasActivity extends AppCompatActivity {
     public void recuperarReceitaTotal() {
         String emailUsuario = autenticacao.getCurrentUser().getEmail();
         String idUsuario = Base64Custom.codificarBase64(emailUsuario);
-        mRef = FirebaseDatabase.getInstance().getReference();
-        mRef.child("usuarios").child(idUsuario);
-        mRef.addValueEventListener(new ValueEventListener() {
+        DatabaseReference usuarioRef = mRef.child("usuarios").child( idUsuario );
+        usuarioRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Usuario usuario = snapshot.getValue(Usuario.class);
