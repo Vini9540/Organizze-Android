@@ -14,7 +14,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView10"
+            android:id="@+id/textSaudacao"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Carregando..."
@@ -23,7 +23,7 @@
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/textView12"
+            android:id="@+id/textSaldo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="R$ 0"
@@ -49,6 +49,7 @@
         app:mcv_tileSize="50dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerMovimentos"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>
