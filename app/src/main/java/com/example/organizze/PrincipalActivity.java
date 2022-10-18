@@ -3,7 +3,9 @@ package com.example.organizze;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.organizze.Adapter.AdapterMovimentacao;
 import com.example.organizze.helper.Base64Custom;
+import com.example.organizze.model.Movimentacao;
 import com.example.organizze.model.Usuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -20,6 +22,8 @@ import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.Menu;
@@ -28,6 +32,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PrincipalActivity extends AppCompatActivity {
 
@@ -37,10 +43,16 @@ public class PrincipalActivity extends AppCompatActivity {
     private Double receitaTotal = 0.0;
     private Double resumoUsuario = 0.0;
 
+    private RecyclerView recyclerView;
+
     private FirebaseAuth autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
     private DatabaseReference usuarioRef;
     private ValueEventListener valueEventListenerUsuario;
+    private AdapterMovimentacao adapterMovimentacao;
+
+    private List<Movimentacao> movimentacoes = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,8 +63,17 @@ public class PrincipalActivity extends AppCompatActivity {
         textoSaldo = findViewById(R.id.textSaldo);
         textoSaudacao = findViewById(R.id.textSaudacao);
         calendarView = findViewById(R.id.calendarView);
-        
+        recyclerView = findViewById(R.id.recyclerMovimentos);
+
         configuraCalendarView();
+
+        adapterMovimentacao = new AdapterMovimentacao(movimentacoes, this);
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter( adapterMovimentacao );
+
 
     }
 
@@ -62,10 +83,10 @@ public class PrincipalActivity extends AppCompatActivity {
         recuperarResumo();
     }
 
-    public void recuperarResumo(){
+    public void recuperarResumo() {
         String emailUsuario = autenticacao.getCurrentUser().getEmail();
         String idUsuario = Base64Custom.codificarBase64(emailUsuario);
-        usuarioRef = mDatabase.child("usuarios").child( idUsuario );
+        usuarioRef = mDatabase.child("usuarios").child(idUsuario);
         Log.i("Evento", "Evento foi Adicionado");
         valueEventListenerUsuario = usuarioRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -79,8 +100,8 @@ public class PrincipalActivity extends AppCompatActivity {
                 DecimalFormat decimalFormat = new DecimalFormat("0.##");
                 String resultadoFormatado = decimalFormat.format(resumoUsuario);
 
-                textoSaudacao.setText("Olá," +usuario.getNome() );
-                textoSaldo.setText("R$ " +resultadoFormatado);
+                textoSaudacao.setText("Olá," + usuario.getNome());
+                textoSaldo.setText("R$ " + resultadoFormatado);
 
             }
 
@@ -100,7 +121,7 @@ public class PrincipalActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menuSair:
                 autenticacao.signOut();
                 startActivity(new Intent(this, MainActivity.class));
@@ -111,22 +132,23 @@ public class PrincipalActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void adicionarDespesa(View view){
-            startActivity(new Intent(this, DespesasActivity.class));
+    public void adicionarDespesa(View view) {
+        startActivity(new Intent(this, DespesasActivity.class));
     }
-    public void adicionarReceita(View view ){
+
+    public void adicionarReceita(View view) {
         startActivity(new Intent(this, ReceitasActivity.class));
     }
 
     public void configuraCalendarView() {
-            CharSequence meses[] = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
-            calendarView.setTitleMonths(meses);
-            calendarView.setOnMonthChangedListener(new OnMonthChangedListener() {
-                @Override
-                public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
+        CharSequence meses[] = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
+        calendarView.setTitleMonths(meses);
+        calendarView.setOnMonthChangedListener(new OnMonthChangedListener() {
+            @Override
+            public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
 
-                }
-            });
+            }
+        });
     }
 
     @Override
