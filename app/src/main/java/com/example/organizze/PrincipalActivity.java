@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +39,8 @@ public class PrincipalActivity extends AppCompatActivity {
 
     private FirebaseAuth autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference usuarioRef;
+    private ValueEventListener valueEventListenerUsuario;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,16 +53,21 @@ public class PrincipalActivity extends AppCompatActivity {
         calendarView = findViewById(R.id.calendarView);
         
         configuraCalendarView();
-        recuperarResumo();
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        recuperarResumo();
     }
 
     public void recuperarResumo(){
         String emailUsuario = autenticacao.getCurrentUser().getEmail();
         String idUsuario = Base64Custom.codificarBase64(emailUsuario);
-        DatabaseReference usuarioRef = mDatabase.child("usuarios").child( idUsuario );
-
-        usuarioRef.addValueEventListener(new ValueEventListener() {
+        usuarioRef = mDatabase.child("usuarios").child( idUsuario );
+        Log.i("Evento", "Evento foi Adicionado");
+        valueEventListenerUsuario = usuarioRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Usuario usuario = snapshot.getValue(Usuario.class);
@@ -119,5 +127,12 @@ public class PrincipalActivity extends AppCompatActivity {
 
                 }
             });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("Evento", "Evento foi removido");
+        usuarioRef.removeEventListener(valueEventListenerUsuario);
     }
 }
