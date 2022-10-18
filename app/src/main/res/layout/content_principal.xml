@@ -40,6 +40,14 @@
             android:textColor="@color/white" />
     </LinearLayout>
 
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:mcv_selectionColor="#00F"
+        app:mcv_showOtherDates="all"
+        app:mcv_tileSize="50dp"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
